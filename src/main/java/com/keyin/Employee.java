@@ -9,6 +9,7 @@ public class Employee {
     private int monthlySalary;
 
     private int hashCode;
+    private int testingThisRightNow;
 
     public Employee(int id, String firstname, String lastname, int monthlySalary){
         this.id=id;
