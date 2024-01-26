@@ -31,16 +31,22 @@ class SuggestionEngineTest {
         assertTrue(suggestionEngine.generateSuggestions("tets").contains("test"));
     }
 
+
     @Test
-    void loadDictionaryData_ValidFile_ShouldLoadWords() throws IOException {
+    void generateSuggestions_MultipleSuggestions_ShouldReturnTopSuggestions() {
         SuggestionEngine suggestionEngine = new SuggestionEngine();
-        Path dictionaryFilePath = Paths.get("path/to/your/words.txt");  // Replace with the actual path
 
-        // Load dictionary data from file
-        suggestionEngine.loadDictionaryData(dictionaryFilePath);
+        // Add known words to the dictionary
+        suggestionEngine.getWordSuggestionDB().put("programming", 2);
+        suggestionEngine.getWordSuggestionDB().put("programmer", 3);
+        suggestionEngine.getWordSuggestionDB().put("project", 1);
 
-        // Check if the loaded word is present in the dictionary
-        assertTrue(suggestionEngine.getWordSuggestionDB().containsKey("example"));
+        // A word with a typo, expecting suggestions
+        String suggestions = suggestionEngine.generateSuggestions("programmer");
+
+        // Ensure top suggestions are returned in the correct order
+        assertTrue(suggestions.startsWith("programmer\nprogramming\n"));
     }
+
 
 }
