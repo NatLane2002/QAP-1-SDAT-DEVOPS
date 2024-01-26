@@ -1,54 +1,46 @@
 package com.keyin;
 
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
+import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
-@ExtendWith(MockitoExtension.class)
-public class SuggestionEngineTest {
-    private SuggestionEngine suggestionEngine = new SuggestionEngine();
+import static org.junit.jupiter.api.Assertions.*;
 
-    @Mock
-    private SuggestionsDatabase mockSuggestionDB;
-    private boolean testInstanceSame = false;
+class SuggestionEngineTest {
 
     @Test
-    public void testGenerateSuggestions() throws Exception {
-        suggestionEngine.loadDictionaryData( Paths.get( ClassLoader.getSystemResource("words.txt").getPath()));
+    void generateSuggestions_CorrectWord_ShouldReturnEmptyString() {
+        SuggestionEngine suggestionEngine = new SuggestionEngine();
 
-//        Assertions.assertTrue(testInstanceSame);
-        Assertions.assertTrue(suggestionEngine.generateSuggestions("hellw").contains("hello"));
+        // Add a known word to the dictionary
+        suggestionEngine.getWordSuggestionDB().put("test", 1);
+
+        // The word is in the dictionary, so suggestions should be an empty string
+        assertEquals("", suggestionEngine.generateSuggestions("test"));
     }
 
     @Test
-    public void testGenerateSuggestionsFail() throws Exception {
-        suggestionEngine.loadDictionaryData( Paths.get( ClassLoader.getSystemResource("words.txt").getPath()));
+    void generateSuggestions_SingleTypo_ShouldReturnSuggestions() {
+        SuggestionEngine suggestionEngine = new SuggestionEngine();
 
-        testInstanceSame = true;
-        Assertions.assertTrue(testInstanceSame);
-        Assertions.assertFalse(suggestionEngine.generateSuggestions("hello").contains("hello"));
+        // Add a known word to the dictionary
+        suggestionEngine.getWordSuggestionDB().put("test", 1);
+
+        // A single typo in the word, expecting suggestions
+        assertTrue(suggestionEngine.generateSuggestions("tets").contains("test"));
     }
 
     @Test
-    public void testSuggestionsAsMock() {
-        Map<String,Integer> wordMapForTest = new HashMap<>();
+    void loadDictionaryData_ValidFile_ShouldLoadWords() throws IOException {
+        SuggestionEngine suggestionEngine = new SuggestionEngine();
+        Path dictionaryFilePath = Paths.get("path/to/your/words.txt");  // Replace with the actual path
 
-        wordMapForTest.put("test", 1);
+        // Load dictionary data from file
+        suggestionEngine.loadDictionaryData(dictionaryFilePath);
 
-        Mockito.when(mockSuggestionDB.getWordMap()).thenReturn(wordMapForTest);
-
-        suggestionEngine.setWordSuggestionDB(mockSuggestionDB);
-
-        Assertions.assertFalse(suggestionEngine.generateSuggestions("test").contains("test"));
-
-        Assertions.assertTrue(suggestionEngine.generateSuggestions("tes").contains("test"));
+        // Check if the loaded word is present in the dictionary
+        assertTrue(suggestionEngine.getWordSuggestionDB().containsKey("example"));
     }
+
 }
