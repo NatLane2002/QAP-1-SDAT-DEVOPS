@@ -8,6 +8,8 @@ public class Employee {
     private String lastname;
     private int monthlySalary;
 
+    private int hashCode;
+
     public Employee(int id, String firstname, String lastname, int monthlySalary){
         this.id=id;
         this.firstname =firstname;
